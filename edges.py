@@ -257,6 +257,4 @@ weighted_nodes = [
     'ул. Шубина, 95, 97', 'Роддом'
 ]
 
-source_node = [
-    'Кем ТЭЦ'
-]
+source_node = 'Кем ТЭЦ'
