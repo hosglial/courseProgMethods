@@ -24,6 +24,8 @@ class GraphModeller:
         self.graph.add_edges_from(edges)
 
     def show_graph(self):
+        plt.clf()
+
         pos = nx.planar_layout(self.graph)
 
         nx.draw_networkx_edges(self.graph, pos, edge_color='b', arrows=False)
@@ -31,8 +33,6 @@ class GraphModeller:
         nx.draw_networkx_nodes(self.graph, pos, node_size=10, margins=0)
 
         nx.draw_networkx_labels(self.graph, pos, font_size=10)
-
-        plt.show()
 
 
 class App:
@@ -59,9 +59,13 @@ class App:
         self.ui.setupUi(self.Form)
 
         self.ui.init_button.clicked.connect(self.import_data)
-        self.ui.imported_graph.clicked.connect(self.draw_imported_graph)
-        self.ui.cleared_graph.clicked.connect(self.draw_cleared_graph)
-        self.ui.drop_button.clicked.connect(self.draw_dropped_graph)
+        self.ui.button_source.clicked.connect(self.draw_imported_graph)
+        self.ui.button_connect.clicked.connect(self.draw_cleared_graph)
+        self.ui.button_weight.clicked.connect(self.draw_dropped_graph)
+        self.ui.source_box.currentIndexChanged.connect(self.change_source)
+
+        plt.ion()
+        plt.show()
 
         self.Form.show()
         sys.exit(self.app.exec_())
@@ -73,6 +77,33 @@ class App:
         mbox.setWindowTitle('Error')
         mbox.setStandardButtons(QMessageBox.Ok)
         mbox.exec_()
+
+    def change_source(self):
+        self.source_node = self.ui.source_box.currentText()
+        print(self.source_node)
+        self.init_graphs()
+
+    def init_graphs(self):
+        # инициализация импортированного графа
+        self.imported_graph.init_graph(self.imported_edges)
+
+        for node in self.imported_graph.graph.nodes:
+            self.ui.source_box.addItem(node)
+
+        self.ui.source_box.setEnabled(True)
+
+        self.cleared_edges = [edge for edge in nx.dfs_edges(self.imported_graph.graph, self.source_node)]
+        self.cleared_graph.init_graph(self.cleared_edges)
+
+        self.dropped_graph.graph = copy.deepcopy(self.cleared_graph.graph)
+
+        self.drop_unweighted(self.dropped_graph.graph)
+
+        self.ui.button_source.setEnabled(True)
+        self.ui.button_weight.setEnabled(True)
+        self.ui.button_connect.setEnabled(True)
+        self.ui.excel_button_2.setEnabled(True)
+        self.ui.excel_button_3.setEnabled(True)
 
     def import_data(self):
         # импортировать данные с excel
@@ -88,34 +119,35 @@ class App:
             self.df_edges = xl.parse('Edges')
             self.df_nodes = xl.parse('Nodes')
 
+            xl.close()
             # заполнение рёбер графа
             for first, second in zip(self.df_edges['first_node'], self.df_edges['second_node']):
                 self.imported_edges.append((first, second))
 
+            if len(list(self.df_edges['first_node'])) != len(list(self.df_edges['second_node'])):
+                self.drop_error('Incorrect edges data')
+                return
+
             # заполнение нод, имеющих вес
             for node in self.df_nodes['weighted_nodes']:
                 self.weight_nodes.append(node)
+                if node not in list(self.df_edges['first_node']) and node not in list(self.df_edges['second_node']):
+                    self.drop_error(f'Weighted node: {node} not present in edges')
+                    return
+
 
             print(self.imported_edges)
             print(self.weight_nodes)
 
             # получение ноды-источника
-            self.source_node = self.df_nodes['source_node'][0]
-            print(self.source_node)
+            # self.source_node = self.df_nodes['source_node'][0]
+            # print(self.source_node)
 
         except (AttributeError, KeyError):
             self.drop_error('Incorrect file')
             return
 
-        # инициализация импортированного графа
-        self.imported_graph.init_graph(self.imported_edges)
-
-        self.cleared_edges = [edge for edge in nx.dfs_edges(self.imported_graph.graph, self.source_node)]
-        self.cleared_graph.init_graph(self.cleared_edges)
-
-        self.dropped_graph.graph = copy.deepcopy(self.cleared_graph.graph)
-
-        self.drop_unweighted(self.dropped_graph.graph)
+        self.init_graphs()
 
     def drop_unweighted(self, graph):
         all_nodes = set(graph.nodes)
@@ -138,7 +170,6 @@ class App:
 
     def draw_dropped_graph(self):
         self.dropped_graph.show_graph()
-
 
 
 app = App()
