@@ -63,6 +63,8 @@ class App:
         self.ui.button_connect.clicked.connect(self.draw_cleared_graph)
         self.ui.button_weight.clicked.connect(self.draw_dropped_graph)
         self.ui.source_box.currentIndexChanged.connect(self.change_source)
+        self.ui.excel_button_2.clicked.connect(self.export_cleared_graph)
+        self.ui.excel_button_3.clicked.connect(self.export_dropped_graph)
 
         plt.ion()
         plt.show()
@@ -135,15 +137,10 @@ class App:
                     self.drop_error(f'Weighted node: {node} not present in edges')
                     return
 
+            # print(self.imported_edges)
+            # print(self.weight_nodes)
 
-            print(self.imported_edges)
-            print(self.weight_nodes)
-
-            # получение ноды-источника
-            # self.source_node = self.df_nodes['source_node'][0]
-            # print(self.source_node)
-
-        except (AttributeError, KeyError):
+        except (AttributeError, KeyError, ValueError):
             self.drop_error('Incorrect file')
             return
 
@@ -171,6 +168,41 @@ class App:
     def draw_dropped_graph(self):
         self.dropped_graph.show_graph()
 
+    def export_cleared_graph(self):
+        self.cleared_df = pd.DataFrame(columns=['first_node', 'second_node'])
+        for edge in self.cleared_graph.graph.edges:
+            self.cleared_df = self.cleared_df.append({'first_node': edge[0], 'second_node': edge[1]}, ignore_index=True)
+
+        dialog = QFileDialog()
+        try:
+            fname = dialog.getSaveFileName(filter='*.xlsx')
+        except InvalidFileException:
+            self.drop_error('File saving error')
+            return
+
+        try:
+            self.cleared_df.to_excel(fname[0])
+        except PermissionError:
+            self.drop_error(
+                'Export error,the exported file is not available for editing.\nClose the exported file')
+
+    def export_dropped_graph(self):
+        self.dropped_df = pd.DataFrame(columns=['first_node', 'second_node'])
+        for edge in self.dropped_graph.graph.edges:
+            self.dropped_df = self.dropped_df.append({'first_node': edge[0], 'second_node': edge[1]}, ignore_index=True)
+
+        dialog = QFileDialog()
+        try:
+            fname = dialog.getSaveFileName(filter='*.xlsx')
+        except InvalidFileException:
+            self.drop_error('File saving error')
+            return
+
+        try:
+            self.dropped_df.to_excel(fname[0])
+        except PermissionError:
+            self.drop_error(
+                'Export error,the exported file is not available for editing.\nClose the exported file')
 
 app = App()
 
