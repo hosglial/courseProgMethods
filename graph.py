@@ -23,7 +23,9 @@ class GraphModeller:
         plt.clf()
 
     def init_graph(self, edges, nodes=None):
-        self.graph.add_edges_from(edges)
+        for e in edges:
+            self.graph.add_edge(e[0], e[1], weight=e[2] if len(e) == 3 else 0)
+        # self.graph.add_edges_from(edges)
 
     def show_graph(self):
         plt.clf()
@@ -44,6 +46,9 @@ class App:
 
         self.cleared_graph = GraphModeller()
         self.cleared_edges = []
+
+        self.sub_graph = GraphModeller()
+        self.sub_edges = []
 
         self.dropped_graph = GraphModeller()
         self.dropped_edges = []
@@ -94,7 +99,20 @@ class App:
         for node in self.imported_graph.graph.nodes:
             self.ui.source_box.addItem(node)
 
-        self.ui.source_box.setEnabled(True)
+        unvisited_edges = list(self.imported_graph.graph.nodes)
+        graph_num = 1
+        while unvisited_edges:
+            dfs = list(nx.dfs_edges(self.imported_graph.graph, unvisited_edges[0]))
+            current_subdgraph = [edge1 for edge1, edge2 in dfs] + [edge2 for edge1, edge2 in dfs]
+            for i in current_subdgraph:
+                if i in unvisited_edges:
+                    unvisited_edges.remove(i)
+            print(graph_num)
+            graph_num += 1
+            print(current_subdgraph)
+
+
+
 
         self.cleared_edges = [edge for edge in nx.dfs_edges(self.imported_graph.graph, self.source_node)]
         self.cleared_graph.init_graph(self.cleared_edges)
@@ -103,6 +121,7 @@ class App:
 
         self.drop_unweighted(self.dropped_graph.graph)
 
+        self.ui.source_box.setEnabled(True)
         self.ui.button_source.setEnabled(True)
         self.ui.button_weight.setEnabled(True)
         self.ui.button_connect.setEnabled(True)
@@ -139,9 +158,6 @@ class App:
                     self.drop_error(f'Weighted node: {node} not present in edges')
                     return
 
-            # print(self.imported_edges)
-            # print(self.weight_nodes)
-
         except (AttributeError, KeyError, ValueError):
             self.drop_error('Incorrect file')
             return
@@ -165,19 +181,8 @@ class App:
         self.imported_graph.show_graph()
 
     def draw_cleared_graph(self):
-        unvisited_edges = list(self.imported_graph.graph.nodes)
-        graph_num = 1
-        while unvisited_edges:
-            dfs = list(nx.dfs_edges(self.imported_graph.graph, unvisited_edges[0]))
-            current_subdgraph = [edge1 for edge1, edge2 in dfs] + [edge2 for edge1, edge2 in dfs]
-            for i in current_subdgraph:
-                if i in unvisited_edges:
-                    unvisited_edges.remove(i)
-            print(graph_num)
-            graph_num += 1
-            print(current_subdgraph)
-
-        self.cleared_graph.show_graph()
+        self.sub_graph.show_graph()
+        # self.cleared_graph.show_graph()
 
     def draw_dropped_graph(self):
         self.dropped_graph.show_graph()
@@ -217,6 +222,7 @@ class App:
         except PermissionError:
             self.drop_error(
                 'Export error,the exported file is not available for editing.\nClose the exported file')
+
 
 app = App()
 

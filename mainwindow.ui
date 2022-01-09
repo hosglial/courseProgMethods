@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>580</width>
-    <height>221</height>
+    <width>594</width>
+    <height>242</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -72,24 +72,6 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="3">
-       <widget class="QLabel" name="label_4">
-        <property name="font">
-         <font>
-          <pointsize>11</pointsize>
-         </font>
-        </property>
-        <property name="layoutDirection">
-         <enum>Qt::LeftToRight</enum>
-        </property>
-        <property name="text">
-         <string>Источник</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-      </item>
       <item row="1" column="0">
        <widget class="QLabel" name="label_2">
         <property name="font">
@@ -98,7 +80,7 @@
          </font>
         </property>
         <property name="text">
-         <string>Граф, точек, свазанных с источником</string>
+         <string>Граф, с пронумерованными подграфами</string>
         </property>
         <property name="wordWrap">
          <bool>true</bool>
@@ -132,18 +114,6 @@
         </property>
         <property name="text">
          <string>Экспортировать</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="3">
-       <widget class="QComboBox" name="source_box">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>11</pointsize>
-         </font>
         </property>
        </widget>
       </item>
@@ -192,6 +162,36 @@
         </property>
        </widget>
       </item>
+      <item row="2" column="3">
+       <widget class="QComboBox" name="source_box">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>11</pointsize>
+         </font>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="3">
+       <widget class="QLabel" name="label_4">
+        <property name="font">
+         <font>
+          <pointsize>11</pointsize>
+         </font>
+        </property>
+        <property name="layoutDirection">
+         <enum>Qt::LeftToRight</enum>
+        </property>
+        <property name="text">
+         <string>Источник</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
      </layout>
     </item>
    </layout>
@@ -201,8 +201,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>580</width>
-     <height>21</height>
+     <width>594</width>
+     <height>26</height>
     </rect>
    </property>
   </widget>
