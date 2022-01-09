@@ -1,5 +1,7 @@
 import copy
 import sys
+from pprint import pprint
+
 import networkx as nx
 import matplotlib.pyplot as plt
 from PySide2.QtWidgets import QFileDialog, QMessageBox, QApplication, QMainWindow
@@ -163,6 +165,18 @@ class App:
         self.imported_graph.show_graph()
 
     def draw_cleared_graph(self):
+        unvisited_edges = list(self.imported_graph.graph.nodes)
+        graph_num = 1
+        while unvisited_edges:
+            dfs = list(nx.dfs_edges(self.imported_graph.graph, unvisited_edges[0]))
+            current_subdgraph = [edge1 for edge1, edge2 in dfs] + [edge2 for edge1, edge2 in dfs]
+            for i in current_subdgraph:
+                if i in unvisited_edges:
+                    unvisited_edges.remove(i)
+            print(graph_num)
+            graph_num += 1
+            print(current_subdgraph)
+
         self.cleared_graph.show_graph()
 
     def draw_dropped_graph(self):
