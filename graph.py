@@ -27,16 +27,21 @@ class GraphModeller:
             self.graph.add_edge(e[0], e[1], weight=e[2] if len(e) == 3 else 0)
         # self.graph.add_edges_from(edges)
 
-    def show_graph(self):
+    def show_graph(self, numbers, names):
         plt.clf()
 
         pos = nx.planar_layout(self.graph)
 
-        nx.draw_networkx_edges(self.graph, pos, edge_color='b', arrows=False)
+        nx.draw_networkx_edges(self.graph, pos, edge_color='b', arrows=False, )
 
         nx.draw_networkx_nodes(self.graph, pos, node_size=10, margins=0)
 
-        nx.draw_networkx_labels(self.graph, pos, font_size=10)
+        if names:
+            nx.draw_networkx_labels(self.graph, pos, font_size=10)
+
+        if numbers:
+            labels = nx.get_edge_attributes(self.graph, 'weight')
+            nx.draw_networkx_edge_labels(self.graph, pos, edge_labels=labels)
 
 
 class App:
@@ -67,7 +72,7 @@ class App:
 
         self.ui.init_button.clicked.connect(self.import_data)
         self.ui.button_source.clicked.connect(self.draw_imported_graph)
-        self.ui.button_connect.clicked.connect(self.draw_cleared_graph)
+        self.ui.button_connect.clicked.connect(self.draw_sub_graph)
         self.ui.button_weight.clicked.connect(self.draw_dropped_graph)
         self.ui.source_box.currentIndexChanged.connect(self.change_source)
         self.ui.excel_button_2.clicked.connect(self.export_cleared_graph)
@@ -96,23 +101,31 @@ class App:
         # инициализация импортированного графа
         self.imported_graph.init_graph(self.imported_edges)
 
-        for node in self.imported_graph.graph.nodes:
+        for node in sorted(self.imported_graph.graph.nodes):
             self.ui.source_box.addItem(node)
 
-        unvisited_edges = list(self.imported_graph.graph.nodes)
+        self.sub_edges = []
+        unvisited_nodes = list(self.imported_graph.graph.nodes)
         graph_num = 1
-        while unvisited_edges:
-            dfs = list(nx.dfs_edges(self.imported_graph.graph, unvisited_edges[0]))
-            current_subdgraph = [edge1 for edge1, edge2 in dfs] + [edge2 for edge1, edge2 in dfs]
-            for i in current_subdgraph:
-                if i in unvisited_edges:
-                    unvisited_edges.remove(i)
+        while unvisited_nodes:
+            current_subgraph = list(nx.dfs_edges(self.imported_graph.graph, unvisited_nodes[0]))
+            current_subnodes = list(nx.dfs_tree(self.imported_graph.graph, unvisited_nodes[0]).nodes)
+
+            tree = nx.dfs_tree(self.imported_graph.graph, unvisited_nodes[0])
+            print(unvisited_nodes[0])
+            for i in current_subnodes:
+                unvisited_nodes.remove(i)
+
             print(graph_num)
+            print(current_subgraph)
+            for i, v in enumerate(current_subgraph):
+                current_subgraph[i] = (v[0], v[1], graph_num)
+
+            self.sub_edges += current_subgraph
             graph_num += 1
-            print(current_subdgraph)
 
-
-
+        print(self.sub_edges)
+        self.sub_graph.init_graph(self.sub_edges)
 
         self.cleared_edges = [edge for edge in nx.dfs_edges(self.imported_graph.graph, self.source_node)]
         self.cleared_graph.init_graph(self.cleared_edges)
@@ -127,6 +140,8 @@ class App:
         self.ui.button_connect.setEnabled(True)
         self.ui.excel_button_2.setEnabled(True)
         self.ui.excel_button_3.setEnabled(True)
+        self.ui.checkBox_names.setEnabled(True)
+        self.ui.checkBox_numbers.setEnabled(True)
 
     def import_data(self):
         # импортировать данные с excel
@@ -135,7 +150,7 @@ class App:
             fname = dialog.getOpenFileName(filter='*.xlsx')
             xl = pd.ExcelFile(fname[0], engine='openpyxl')
         except InvalidFileException:
-            self.drop_error('File opening error')
+            self.drop_error('Ошибка открытия файла')
             return
 
         try:
@@ -159,7 +174,7 @@ class App:
                     return
 
         except (AttributeError, KeyError, ValueError):
-            self.drop_error('Incorrect file')
+            self.drop_error('Некорректный файл')
             return
 
         self.init_graphs()
@@ -178,32 +193,46 @@ class App:
         return graph
 
     def draw_imported_graph(self):
-        self.imported_graph.show_graph()
+        self.imported_graph.show_graph(False, True)
 
-    def draw_cleared_graph(self):
-        self.sub_graph.show_graph()
-        # self.cleared_graph.show_graph()
+    def draw_sub_graph(self):
+        self.sub_graph.show_graph(self.ui.checkBox_numbers.isChecked(), self.ui.checkBox_names.isChecked())
 
     def draw_dropped_graph(self):
-        self.dropped_graph.show_graph()
+        self.dropped_graph.show_graph(False, True)
 
     def export_cleared_graph(self):
-        self.cleared_df = pd.DataFrame(columns=['first_node', 'second_node'])
-        for edge in self.cleared_graph.graph.edges:
-            self.cleared_df = self.cleared_df.append({'first_node': edge[0], 'second_node': edge[1]}, ignore_index=True)
+        self.subgraph_df = pd.DataFrame(columns=['first_node', 'second_node', 'subgraph_number'])
+        self.subgraph_df_nodes = pd.DataFrame(columns=['node', 'subgraph_number'])
+
+        nodes = {}
+        for edge in self.sub_edges:
+            self.subgraph_df = self.subgraph_df.append(
+                {'first_node': edge[0], 'second_node': edge[1], 'subgraph_number': edge[2]}, ignore_index=True)
+
+            nodes[edge[0]] = edge[2]
+            nodes[edge[1]] = edge[2]
+
+        for node in nodes:
+            self.subgraph_df_nodes = self.subgraph_df_nodes.append(
+                {'node': node, 'subgraph_number': nodes[node]}, ignore_index=True)
 
         dialog = QFileDialog()
         try:
             fname = dialog.getSaveFileName(filter='*.xlsx')
         except InvalidFileException:
-            self.drop_error('File saving error')
+            self.drop_error('Ошибка сохранения файла')
             return
 
         try:
-            self.cleared_df.to_excel(fname[0])
+            writer = pd.ExcelWriter(fname[0], writer='openpyxl')
+            self.subgraph_df.to_excel(writer, sheet_name='edges')
+            self.subgraph_df_nodes.to_excel(writer, sheet_name='nodes')
+            writer.save()
+            writer.close()
         except PermissionError:
             self.drop_error(
-                'Export error,the exported file is not available for editing.\nClose the exported file')
+                'Ошибка экспорта, сохраняемый файл недоступен для редактирования\nЗакройте сохраняемый файл')
 
     def export_dropped_graph(self):
         self.dropped_df = pd.DataFrame(columns=['first_node', 'second_node'])
@@ -214,96 +243,16 @@ class App:
         try:
             fname = dialog.getSaveFileName(filter='*.xlsx')
         except InvalidFileException:
-            self.drop_error('File saving error')
+            self.drop_error('Ошибка сохранения файла')
             return
 
         try:
             self.dropped_df.to_excel(fname[0])
         except PermissionError:
             self.drop_error(
-                'Export error,the exported file is not available for editing.\nClose the exported file')
+                'Ошибка экспорта, сохраняемый файл недоступен для редактирования\nЗакройте сохраняемый файл')
 
 
 app = App()
 
 app.import_data()
-#
-# app.draw_imported_graph()
-#
-# app.draw_cleared_graph()
-
-#
-#
-#
-#
-#
-# Gr1 = nx.Graph()
-#
-# draw_all = True
-#
-# Gr1.add_edges_from(edges)
-#
-# all_edges = [edge for edge in Gr1.edges()]
-#
-# green_edges = [edge for edge in nx.dfs_edges(Gr1, 'Кем ТЭЦ')]  # подключенный подграф
-# black_edges = [edge for edge in Gr1.edges() if edge not in green_edges]  # неподключенный подграф
-#
-# edge_colours = ['black' if not edge in green_edges else 'green'
-#                 for edge in Gr1.edges()]
-#
-# nodeset = set()
-# for n1, n2 in green_edges:
-#     nodeset.add(n1)
-#     nodeset.add(n2)
-#
-# G = nx.Graph()
-#
-# # рисуем связи
-#
-# if draw_all:
-#     G.add_edges_from(all_edges)
-#     pos = nx.planar_layout(G)
-#
-#     nx.draw_networkx_edges(G, pos, edgelist=all_edges, edge_color='r', arrows=False)
-#
-#     nx.draw_networkx_nodes(G, pos, node_size=10, margins=0)
-#
-#     nx.draw_networkx_labels(G, pos, font_size=10)
-# else:
-#     G.add_edges_from(green_edges)
-#     pos = nx.planar_layout(G, center=(10, 10), scale=10)
-#
-#     nx.draw_networkx_nodes(G, pos, nodelist=list(nodeset), node_size=10, margins=0)  # рисуем все ноды
-#
-#     nx.draw_networkx_edges(G, pos, edgelist=green_edges, edge_color='g', arrows=False)
-#
-#     nx.draw_networkx_labels(G, pos, labels={k: k for k in nodeset}, font_size=10)  # рисуем все подписи
-#
-#
-#
-# # print(list(nx.neighbors(Gr2,'ТК-41/1')))
-# # for i in nx.neighbors(Gr2,'ТК-41/1'):
-# #     print(i)
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-# drop_unweighted(Graph=G)
-#
-# plt.clf()
-#
-# pos = nx.planar_layout(G, center=(10, 10), scale=10)
-#
-# nx.draw_networkx_nodes(G, pos, node_size=10, margins=0)  # рисуем все ноды
-#
-# nx.draw_networkx_edges(G, pos, edge_color='g', arrows=False)
-#
-# nx.draw_networkx_labels(G, pos, font_size=10)  # рисуем все подписи
-#
-# plt.show()
