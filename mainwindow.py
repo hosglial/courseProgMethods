@@ -27,13 +27,14 @@ class Ui_MainWindow(object):
         self.init_button = QPushButton(self.centralwidget)
         self.init_button.setObjectName(u"init_button")
         font = QFont()
-        font.setPointSize(12)
+        font.setPointSize(11)
         self.init_button.setFont(font)
 
         self.horizontalLayout.addWidget(self.init_button)
 
         self.label_5 = QLabel(self.centralwidget)
         self.label_5.setObjectName(u"label_5")
+        self.label_5.setFont(font)
 
         self.horizontalLayout.addWidget(self.label_5)
 
@@ -112,6 +113,7 @@ class Ui_MainWindow(object):
 
         self.gridLayout.addWidget(self.excel_button_3, 2, 2, 1, 1)
 
+        self.gridLayout.setColumnStretch(0, 1)
 
         self.verticalLayout.addLayout(self.gridLayout)
 
@@ -132,16 +134,16 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
-        self.init_button.setText(QCoreApplication.translate("MainWindow", u"ImportExcelData", None))
+        self.init_button.setText(QCoreApplication.translate("MainWindow", u"\u0418\u043c\u043f\u043e\u0440\u0442\u0438\u0440\u043e\u0432\u0430\u0442\u044c \u0434\u0430\u043d\u043d\u044b\u0435", None))
         self.label_5.setText("")
-        self.label.setText(QCoreApplication.translate("MainWindow", u"Show source graph", None))
-        self.button_source.setText(QCoreApplication.translate("MainWindow", u"ShowSource", None))
-        self.label_4.setText(QCoreApplication.translate("MainWindow", u"Source node", None))
-        self.label_2.setText(QCoreApplication.translate("MainWindow", u"Show graph anchored to origin", None))
-        self.button_connect.setText(QCoreApplication.translate("MainWindow", u"ShowConnect", None))
-        self.excel_button_2.setText(QCoreApplication.translate("MainWindow", u"ExportExcelData", None))
-        self.label_3.setText(QCoreApplication.translate("MainWindow", u"Show graph without unloaded dead ends", None))
-        self.button_weight.setText(QCoreApplication.translate("MainWindow", u"ShowWeight", None))
-        self.excel_button_3.setText(QCoreApplication.translate("MainWindow", u"ExportExcelData", None))
+        self.label.setText(QCoreApplication.translate("MainWindow", u"\u0418\u0441\u0445\u043e\u0434\u043d\u044b\u0439 \u0433\u0440\u0430\u0444", None))
+        self.button_source.setText(QCoreApplication.translate("MainWindow", u"\u041f\u043e\u043a\u0430\u0437\u0430\u0442\u044c", None))
+        self.label_4.setText(QCoreApplication.translate("MainWindow", u"\u0418\u0441\u0442\u043e\u0447\u043d\u0438\u043a", None))
+        self.label_2.setText(QCoreApplication.translate("MainWindow", u"\u0413\u0440\u0430\u0444, \u0442\u043e\u0447\u0435\u043a, \u0441\u0432\u0430\u0437\u0430\u043d\u043d\u044b\u0445 \u0441 \u0438\u0441\u0442\u043e\u0447\u043d\u0438\u043a\u043e\u043c", None))
+        self.button_connect.setText(QCoreApplication.translate("MainWindow", u"\u041f\u043e\u043a\u0430\u0437\u0430\u0442\u044c", None))
+        self.excel_button_2.setText(QCoreApplication.translate("MainWindow", u"\u042d\u043a\u0441\u043f\u043e\u0440\u0442\u0438\u0440\u043e\u0432\u0430\u0442\u044c", None))
+        self.label_3.setText(QCoreApplication.translate("MainWindow", u"\u0413\u0440\u0430\u0444 \u0431\u0435\u0437 \u043d\u0435\u043d\u0430\u0433\u0440\u0443\u0436\u0435\u043d\u043d\u044b\u0445 \u0442\u0443\u043f\u0438\u043a\u043e\u0432", None))
+        self.button_weight.setText(QCoreApplication.translate("MainWindow", u"\u041f\u043e\u043a\u0430\u0437\u0430\u0442\u044c", None))
+        self.excel_button_3.setText(QCoreApplication.translate("MainWindow", u"\u042d\u043a\u0441\u043f\u043e\u0440\u0442\u0438\u0440\u043e\u0432\u0430\u0442\u044c", None))
     # retranslateUi
 

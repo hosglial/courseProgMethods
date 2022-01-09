@@ -21,16 +21,21 @@
        <widget class="QPushButton" name="init_button">
         <property name="font">
          <font>
-          <pointsize>12</pointsize>
+          <pointsize>11</pointsize>
          </font>
         </property>
         <property name="text">
-         <string>ImportExcelData</string>
+         <string>Импортировать данные</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QLabel" name="label_5">
+        <property name="font">
+         <font>
+          <pointsize>11</pointsize>
+         </font>
+        </property>
         <property name="text">
          <string/>
         </property>
@@ -39,16 +44,16 @@
      </layout>
     </item>
     <item>
-     <layout class="QGridLayout" name="gridLayout">
+     <layout class="QGridLayout" name="gridLayout" columnstretch="1,0,0,0">
       <item row="0" column="0">
        <widget class="QLabel" name="label">
         <property name="font">
          <font>
-          <pointsize>12</pointsize>
+          <pointsize>11</pointsize>
          </font>
         </property>
         <property name="text">
-         <string>Show source graph</string>
+         <string>Исходный граф</string>
         </property>
        </widget>
       </item>
@@ -59,11 +64,11 @@
         </property>
         <property name="font">
          <font>
-          <pointsize>12</pointsize>
+          <pointsize>11</pointsize>
          </font>
         </property>
         <property name="text">
-         <string>ShowSource</string>
+         <string>Показать</string>
         </property>
        </widget>
       </item>
@@ -71,14 +76,14 @@
        <widget class="QLabel" name="label_4">
         <property name="font">
          <font>
-          <pointsize>12</pointsize>
+          <pointsize>11</pointsize>
          </font>
         </property>
         <property name="layoutDirection">
          <enum>Qt::LeftToRight</enum>
         </property>
         <property name="text">
-         <string>Source node</string>
+         <string>Источник</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
@@ -89,11 +94,11 @@
        <widget class="QLabel" name="label_2">
         <property name="font">
          <font>
-          <pointsize>12</pointsize>
+          <pointsize>11</pointsize>
          </font>
         </property>
         <property name="text">
-         <string>Show graph anchored to origin</string>
+         <string>Граф, точек, свазанных с источником</string>
         </property>
         <property name="wordWrap">
          <bool>true</bool>
@@ -107,11 +112,11 @@
         </property>
         <property name="font">
          <font>
-          <pointsize>12</pointsize>
+          <pointsize>11</pointsize>
          </font>
         </property>
         <property name="text">
-         <string>ShowConnect</string>
+         <string>Показать</string>
         </property>
        </widget>
       </item>
@@ -122,11 +127,11 @@
         </property>
         <property name="font">
          <font>
-          <pointsize>12</pointsize>
+          <pointsize>11</pointsize>
          </font>
         </property>
         <property name="text">
-         <string>ExportExcelData</string>
+         <string>Экспортировать</string>
         </property>
        </widget>
       </item>
@@ -137,7 +142,7 @@
         </property>
         <property name="font">
          <font>
-          <pointsize>12</pointsize>
+          <pointsize>11</pointsize>
          </font>
         </property>
        </widget>
@@ -146,11 +151,11 @@
        <widget class="QLabel" name="label_3">
         <property name="font">
          <font>
-          <pointsize>12</pointsize>
+          <pointsize>11</pointsize>
          </font>
         </property>
         <property name="text">
-         <string>Show graph without unloaded dead ends</string>
+         <string>Граф без ненагруженных тупиков</string>
         </property>
         <property name="wordWrap">
          <bool>true</bool>
@@ -164,11 +169,11 @@
         </property>
         <property name="font">
          <font>
-          <pointsize>12</pointsize>
+          <pointsize>11</pointsize>
          </font>
         </property>
         <property name="text">
-         <string>ShowWeight</string>
+         <string>Показать</string>
         </property>
        </widget>
       </item>
@@ -179,11 +184,11 @@
         </property>
         <property name="font">
          <font>
-          <pointsize>12</pointsize>
+          <pointsize>11</pointsize>
          </font>
         </property>
         <property name="text">
-         <string>ExportExcelData</string>
+         <string>Экспортировать</string>
         </property>
        </widget>
       </item>
