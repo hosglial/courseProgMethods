@@ -17,43 +17,24 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(580, 221)
+        MainWindow.resize(837, 229)
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.verticalLayout = QVBoxLayout(self.centralwidget)
         self.verticalLayout.setObjectName(u"verticalLayout")
-        self.horizontalLayout = QHBoxLayout()
-        self.horizontalLayout.setObjectName(u"horizontalLayout")
+        self.horizontalLayout_4 = QHBoxLayout()
+        self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
         self.init_button = QPushButton(self.centralwidget)
         self.init_button.setObjectName(u"init_button")
         font = QFont()
         font.setPointSize(12)
         self.init_button.setFont(font)
 
-        self.horizontalLayout.addWidget(self.init_button)
+        self.horizontalLayout_4.addWidget(self.init_button)
 
-        self.label_5 = QLabel(self.centralwidget)
-        self.label_5.setObjectName(u"label_5")
+        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
-        self.horizontalLayout.addWidget(self.label_5)
-
-
-        self.verticalLayout.addLayout(self.horizontalLayout)
-
-        self.gridLayout = QGridLayout()
-        self.gridLayout.setObjectName(u"gridLayout")
-        self.label = QLabel(self.centralwidget)
-        self.label.setObjectName(u"label")
-        self.label.setFont(font)
-
-        self.gridLayout.addWidget(self.label, 0, 0, 1, 1)
-
-        self.button_source = QPushButton(self.centralwidget)
-        self.button_source.setObjectName(u"button_source")
-        self.button_source.setEnabled(False)
-        self.button_source.setFont(font)
-
-        self.gridLayout.addWidget(self.button_source, 0, 1, 1, 1)
+        self.horizontalLayout_4.addItem(self.horizontalSpacer)
 
         self.label_4 = QLabel(self.centralwidget)
         self.label_4.setObjectName(u"label_4")
@@ -61,65 +42,70 @@ class Ui_MainWindow(object):
         self.label_4.setLayoutDirection(Qt.LeftToRight)
         self.label_4.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout.addWidget(self.label_4, 0, 3, 1, 1)
-
-        self.label_2 = QLabel(self.centralwidget)
-        self.label_2.setObjectName(u"label_2")
-        self.label_2.setFont(font)
-        self.label_2.setWordWrap(True)
-
-        self.gridLayout.addWidget(self.label_2, 1, 0, 1, 1)
-
-        self.button_connect = QPushButton(self.centralwidget)
-        self.button_connect.setObjectName(u"button_connect")
-        self.button_connect.setEnabled(False)
-        self.button_connect.setFont(font)
-
-        self.gridLayout.addWidget(self.button_connect, 1, 1, 1, 1)
-
-        self.excel_button_2 = QPushButton(self.centralwidget)
-        self.excel_button_2.setObjectName(u"excel_button_2")
-        self.excel_button_2.setEnabled(False)
-        self.excel_button_2.setFont(font)
-
-        self.gridLayout.addWidget(self.excel_button_2, 1, 2, 1, 1)
+        self.horizontalLayout_4.addWidget(self.label_4)
 
         self.source_box = QComboBox(self.centralwidget)
         self.source_box.setObjectName(u"source_box")
         self.source_box.setEnabled(False)
+        self.source_box.setMinimumSize(QSize(350, 0))
         self.source_box.setFont(font)
 
-        self.gridLayout.addWidget(self.source_box, 1, 3, 1, 1)
+        self.horizontalLayout_4.addWidget(self.source_box)
 
+
+        self.verticalLayout.addLayout(self.horizontalLayout_4)
+
+        self.horizontalLayout = QHBoxLayout()
+        self.horizontalLayout.setObjectName(u"horizontalLayout")
+        self.label = QLabel(self.centralwidget)
+        self.label.setObjectName(u"label")
+        self.label.setFont(font)
+
+        self.horizontalLayout.addWidget(self.label)
+
+        self.button_source = QPushButton(self.centralwidget)
+        self.button_source.setObjectName(u"button_source")
+        self.button_source.setEnabled(False)
+        self.button_source.setFont(font)
+
+        self.horizontalLayout.addWidget(self.button_source)
+
+
+        self.verticalLayout.addLayout(self.horizontalLayout)
+
+        self.horizontalLayout_3 = QHBoxLayout()
+        self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
         self.label_3 = QLabel(self.centralwidget)
         self.label_3.setObjectName(u"label_3")
         self.label_3.setFont(font)
         self.label_3.setWordWrap(True)
 
-        self.gridLayout.addWidget(self.label_3, 2, 0, 1, 1)
+        self.horizontalLayout_3.addWidget(self.label_3)
 
-        self.button_weight = QPushButton(self.centralwidget)
-        self.button_weight.setObjectName(u"button_weight")
-        self.button_weight.setEnabled(False)
-        self.button_weight.setFont(font)
+        self.button_cleared = QPushButton(self.centralwidget)
+        self.button_cleared.setObjectName(u"button_cleared")
+        self.button_cleared.setEnabled(False)
+        self.button_cleared.setFont(font)
 
-        self.gridLayout.addWidget(self.button_weight, 2, 1, 1, 1)
+        self.horizontalLayout_3.addWidget(self.button_cleared)
 
         self.excel_button_3 = QPushButton(self.centralwidget)
         self.excel_button_3.setObjectName(u"excel_button_3")
         self.excel_button_3.setEnabled(False)
         self.excel_button_3.setFont(font)
 
-        self.gridLayout.addWidget(self.excel_button_3, 2, 2, 1, 1)
+        self.horizontalLayout_3.addWidget(self.excel_button_3)
 
+        self.horizontalLayout_3.setStretch(0, 2)
+        self.horizontalLayout_3.setStretch(1, 1)
+        self.horizontalLayout_3.setStretch(2, 1)
 
-        self.verticalLayout.addLayout(self.gridLayout)
+        self.verticalLayout.addLayout(self.horizontalLayout_3)
 
-        self.verticalLayout.setStretch(1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 580, 21))
+        self.menubar.setGeometry(QRect(0, 0, 837, 26))
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(MainWindow)
         self.statusbar.setObjectName(u"statusbar")
@@ -132,16 +118,12 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
-        self.init_button.setText(QCoreApplication.translate("MainWindow", u"ImportExcelData", None))
-        self.label_5.setText("")
-        self.label.setText(QCoreApplication.translate("MainWindow", u"Show source graph", None))
-        self.button_source.setText(QCoreApplication.translate("MainWindow", u"ShowSource", None))
-        self.label_4.setText(QCoreApplication.translate("MainWindow", u"Source node", None))
-        self.label_2.setText(QCoreApplication.translate("MainWindow", u"Show graph anchored to origin", None))
-        self.button_connect.setText(QCoreApplication.translate("MainWindow", u"ShowConnect", None))
-        self.excel_button_2.setText(QCoreApplication.translate("MainWindow", u"ExportExcelData", None))
-        self.label_3.setText(QCoreApplication.translate("MainWindow", u"Show graph without unloaded dead ends", None))
-        self.button_weight.setText(QCoreApplication.translate("MainWindow", u"ShowWeight", None))
-        self.excel_button_3.setText(QCoreApplication.translate("MainWindow", u"ExportExcelData", None))
+        self.init_button.setText(QCoreApplication.translate("MainWindow", u"\u0418\u043c\u043f\u043e\u0440\u0442\u0438\u0440\u043e\u0432\u0430\u0442\u044c \u0434\u0430\u043d\u043d\u044b\u0435", None))
+        self.label_4.setText(QCoreApplication.translate("MainWindow", u"\u0418\u0441\u0442\u043e\u0447\u043d\u0438\u043a:", None))
+        self.label.setText(QCoreApplication.translate("MainWindow", u"\u0418\u0441\u0445\u043e\u0434\u043d\u044b\u0439 \u0433\u0440\u0430\u0444", None))
+        self.button_source.setText(QCoreApplication.translate("MainWindow", u"\u041f\u043e\u043a\u0430\u0437\u0430\u0442\u044c", None))
+        self.label_3.setText(QCoreApplication.translate("MainWindow", u"\u0413\u0440\u0430\u0444 \u0441 \u044d\u043a\u0432\u0438\u0432\u0430\u043b\u0435\u043d\u0442\u0438\u0440\u043e\u0432\u0430\u043d\u043d\u044b\u043c\u0438 \u0442\u0443\u043f\u0438\u043a\u0430\u043c\u0438", None))
+        self.button_cleared.setText(QCoreApplication.translate("MainWindow", u"\u041f\u043e\u043a\u0430\u0437\u0430\u0442\u044c", None))
+        self.excel_button_3.setText(QCoreApplication.translate("MainWindow", u"\u042d\u043a\u0441\u043f\u043e\u0440\u0442\u0438\u0440\u043e\u0432\u0430\u0442\u044c", None))
     # retranslateUi
 

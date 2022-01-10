@@ -6,17 +6,17 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>580</width>
-    <height>221</height>
+    <width>837</width>
+    <height>229</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1">
+   <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout">
+     <layout class="QHBoxLayout" name="horizontalLayout_4">
       <item>
        <widget class="QPushButton" name="init_button">
         <property name="font">
@@ -25,49 +25,24 @@
          </font>
         </property>
         <property name="text">
-         <string>ImportExcelData</string>
+         <string>Импортировать данные</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="label_5">
-        <property name="text">
-         <string/>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
         </property>
-       </widget>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
       </item>
-     </layout>
-    </item>
-    <item>
-     <layout class="QGridLayout" name="gridLayout">
-      <item row="0" column="0">
-       <widget class="QLabel" name="label">
-        <property name="font">
-         <font>
-          <pointsize>12</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>Show source graph</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QPushButton" name="button_source">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>12</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>ShowSource</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="3">
+      <item>
        <widget class="QLabel" name="label_4">
         <property name="font">
          <font>
@@ -78,63 +53,24 @@
          <enum>Qt::LeftToRight</enum>
         </property>
         <property name="text">
-         <string>Source node</string>
+         <string>Источник:</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
       </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_2">
-        <property name="font">
-         <font>
-          <pointsize>12</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>Show graph anchored to origin</string>
-        </property>
-        <property name="wordWrap">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QPushButton" name="button_connect">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>12</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>ShowConnect</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="2">
-       <widget class="QPushButton" name="excel_button_2">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>12</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>ExportExcelData</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="3">
+      <item>
        <widget class="QComboBox" name="source_box">
         <property name="enabled">
          <bool>false</bool>
         </property>
+        <property name="minimumSize">
+         <size>
+          <width>350</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="font">
          <font>
           <pointsize>12</pointsize>
@@ -142,7 +78,42 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="0">
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QLabel" name="label">
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Исходный граф</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="button_source">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Показать</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="2,1,1">
+      <item>
        <widget class="QLabel" name="label_3">
         <property name="font">
          <font>
@@ -150,15 +121,15 @@
          </font>
         </property>
         <property name="text">
-         <string>Show graph without unloaded dead ends</string>
+         <string>Граф с эквивалентированными тупиками</string>
         </property>
         <property name="wordWrap">
          <bool>true</bool>
         </property>
        </widget>
       </item>
-      <item row="2" column="1">
-       <widget class="QPushButton" name="button_weight">
+      <item>
+       <widget class="QPushButton" name="button_cleared">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -168,11 +139,11 @@
          </font>
         </property>
         <property name="text">
-         <string>ShowWeight</string>
+         <string>Показать</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="2">
+      <item>
        <widget class="QPushButton" name="excel_button_3">
         <property name="enabled">
          <bool>false</bool>
@@ -183,7 +154,7 @@
          </font>
         </property>
         <property name="text">
-         <string>ExportExcelData</string>
+         <string>Экспортировать</string>
         </property>
        </widget>
       </item>
@@ -196,8 +167,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>580</width>
-     <height>21</height>
+     <width>837</width>
+     <height>26</height>
     </rect>
    </property>
   </widget>
