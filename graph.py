@@ -24,7 +24,8 @@ class GraphModeller:
         plt.clf()
 
     def init_graph(self, edges, nodes=None):
-        self.graph.add_edges_from(edges)
+        for e in edges:
+            self.graph.add_edge(e[0], e[1], weight=e[2] if len(e) == 3 else 0)
 
     def show_graph(self):
         plt.clf()
@@ -37,15 +38,19 @@ class GraphModeller:
 
         nx.draw_networkx_labels(self.graph, pos, font_size=10)
 
+        labels = nx.get_edge_attributes(self.graph, 'weight')
+        nx.draw_networkx_edge_labels(self.graph, pos, edge_labels=labels)
+
 
 class App:
     def __init__(self):
-        self.counted_nodes = {}
         self.imported_graph = GraphModeller()
         self.imported_edges = []
 
         self.cleared_graph = GraphModeller()
         self.cleared_edges = []
+        self.counted_edges = []
+        self.counted_nodes = {}
 
         self.eq_graph = GraphModeller()
         self.dropped_edges = []
@@ -97,7 +102,26 @@ class App:
         self.ui.source_box.setEnabled(True)
 
         self.cleared_edges = [edge for edge in nx.dfs_edges(self.imported_graph.graph, self.source_node)]
-        self.cleared_graph.init_graph(self.cleared_edges)
+
+        # эквивалентирование
+        tr = Tree()
+        tr.create_node(self.cleared_edges[0][0], self.cleared_edges[0][0], data=0)
+        tr.create_node(self.cleared_edges[0][1], self.cleared_edges[0][1], parent=self.cleared_edges[0][0], data=0)
+        for e1, e2 in self.cleared_edges[1:]:
+            tr.create_node(e2, e2, parent=e1, data=self.weight_nodes[e2] if e2 in self.weight_nodes else 0)
+
+        tr_dict = tr.to_dict(with_data=True)
+
+        self.count_data(tr_dict)
+
+        self.dfs(tr_dict)
+
+        pprint(self.counted_nodes)
+
+        for n1, n2 in self.cleared_edges:
+            self.counted_edges.append((n1, n2, self.counted_nodes.get(n2, 0)))
+
+        self.cleared_graph.init_graph(self.counted_edges)
 
         self.eq_graph.graph = copy.deepcopy(self.cleared_graph.graph)
 
@@ -166,19 +190,6 @@ class App:
         self.counted_nodes[list(node.keys())[0]] = node_data['data']
 
     def equvalent(self, graph):
-        tr = Tree()
-        tr.create_node(self.cleared_edges[0][0], self.cleared_edges[0][0], data=0)
-        tr.create_node(self.cleared_edges[0][1], self.cleared_edges[0][1], parent=self.cleared_edges[0][0], data=0)
-        for e1, e2 in self.cleared_edges[1:]:
-            tr.create_node(e2, e2, parent=e1, data=self.weight_nodes[e2] if e2 in self.weight_nodes else 0)
-
-        tr_dict = tr.to_dict(with_data=True)
-
-        self.count_data(tr_dict)
-
-        self.dfs(tr_dict)
-
-        pprint(self.counted_nodes)
 
         return graph
 
@@ -189,7 +200,31 @@ class App:
         self.cleared_graph.show_graph()
 
     def export_eq_graph(self):
-        self.cleared_graph.show_graph()
+        self.eq_df = pd.DataFrame(columns=['точка1', 'точка2', 'нагрузка'])
+        self.eq_df_nodes = pd.DataFrame(columns=['точка', 'нагрузка'])
+
+        for edge in self.counted_edges:
+            self.eq_df = self.eq_df.append(
+                {'точка1': edge[0], 'точка2': edge[1], 'нагрузка': edge[2]}, ignore_index=True)
+
+        for node in self.counted_nodes:
+            self.eq_df_nodes = self.eq_df_nodes.append(
+                {'точка': node, 'нагрузка': self.counted_nodes[node]}, ignore_index=True)
+
+        dialog = QFileDialog()
+        try:
+            fname = dialog.getSaveFileName(filter='*.xlsx')
+        except InvalidFileException:
+            self.drop_error('Ошибка сохранения файла')
+            return
+
+        try:
+            with pd.ExcelWriter(fname[0]) as writer:
+                self.eq_df.to_excel(writer, sheet_name='edges')
+                self.eq_df_nodes.to_excel(writer, sheet_name='nodes')
+        except PermissionError:
+            self.drop_error(
+                'Ошибка экспорта, сохраняемый файл недоступен для редактирования\nЗакройте сохраняемый файл')
 
 
 app = App()
