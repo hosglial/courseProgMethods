@@ -94,7 +94,6 @@ class App:
 
     def change_source(self):
         self.source_node = self.ui.source_box.currentText()
-        print(self.source_node)
         self.init_graphs()
 
     def init_graphs(self):
@@ -111,13 +110,9 @@ class App:
             current_subgraph = list(nx.dfs_edges(self.imported_graph.graph, unvisited_nodes[0]))
             current_subnodes = list(nx.dfs_tree(self.imported_graph.graph, unvisited_nodes[0]).nodes)
 
-            tree = nx.dfs_tree(self.imported_graph.graph, unvisited_nodes[0])
-            print(unvisited_nodes[0])
             for i in current_subnodes:
                 unvisited_nodes.remove(i)
 
-            print(graph_num)
-            print(current_subgraph)
             for i, v in enumerate(current_subgraph):
                 current_subgraph[i] = (v[0], v[1], graph_num)
 
