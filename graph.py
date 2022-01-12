@@ -107,8 +107,10 @@ class App:
 
         self.take_nodes(tr_dict)
 
+        self.counted_edges.clear()
         for n1, n2 in self.cleared_edges:
-            self.counted_edges.append((n1, n2, self.counted_nodes.get(n2, 0)))
+            if self.counted_nodes.get(n2, 0) > 0:
+                self.counted_edges.append((n1, n2, self.counted_nodes.get(n2, 0)))
 
         self.eq_graph.init_graph(self.counted_edges)
 
