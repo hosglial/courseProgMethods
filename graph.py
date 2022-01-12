@@ -101,6 +101,8 @@ class App:
 
         self.ui.source_box.setEnabled(True)
 
+        self.drop_unweighted(self.cleared_graph.graph)
+
         self.cleared_edges = [edge for edge in nx.dfs_edges(self.imported_graph.graph, self.source_node)]
 
         # эквивалентирование
@@ -130,6 +132,19 @@ class App:
         self.ui.button_source.setEnabled(True)
         self.ui.excel_button_3.setEnabled(True)
         self.ui.button_cleared.setEnabled(True)
+
+    def drop_unweighted(self, graph):
+        all_nodes = set(graph.nodes)
+        while len(all_nodes) > 0:
+            fnodes = list(
+                filter(
+                    lambda x: nx.degree(graph, x) == 1 and x not in self.source_node and x not in self.weight_nodes.keys(),
+                    graph.nodes))
+            for node in fnodes:
+                graph.remove_node(node)
+            if len(fnodes) == 0:
+                break
+        return graph
 
     def import_data(self):
         # импортировать данные с excel
