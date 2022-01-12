@@ -7,10 +7,7 @@ import matplotlib.pyplot as plt
 from PySide2.QtWidgets import QFileDialog, QMessageBox, QApplication, QMainWindow
 import pandas as pd
 from treelib import Tree
-
-# from edges import edges, weighted_nodes, source_node
 from openpyxl.utils.exceptions import InvalidFileException
-
 from mainwindow import Ui_MainWindow
 
 
@@ -27,20 +24,6 @@ class GraphModeller:
         for e in edges:
             self.graph.add_edge(e[0], e[1], weight=e[2] if len(e) == 3 else 0)
 
-    def show_graph(self):
-        plt.clf()
-
-        pos = nx.planar_layout(self.graph)
-
-        nx.draw_networkx_edges(self.graph, pos, edge_color='b', arrows=False)
-
-        nx.draw_networkx_nodes(self.graph, pos, node_size=10, margins=0)
-
-        nx.draw_networkx_labels(self.graph, pos, font_size=10)
-
-        labels = nx.get_edge_attributes(self.graph, 'weight')
-        nx.draw_networkx_edge_labels(self.graph, pos, edge_labels=labels)
-
 
 class App:
     def __init__(self):
@@ -53,7 +36,6 @@ class App:
         self.counted_nodes = {}
 
         self.eq_graph = GraphModeller()
-        self.dropped_edges = []
 
         self.weight_nodes = {}
 
@@ -68,11 +50,8 @@ class App:
         self.ui.setupUi(self.Form)
 
         self.ui.init_button.clicked.connect(self.import_data)
-        self.ui.button_source.clicked.connect(self.draw_imported_graph)
         self.ui.source_box.currentIndexChanged.connect(self.change_source)
         self.ui.excel_button_3.clicked.connect(self.export_eq_graph)
-        self.ui.button_cleared.clicked.connect(self.draw_cleared_graph)
-
         plt.ion()
         plt.show()
 
@@ -127,18 +106,15 @@ class App:
 
         self.eq_graph.graph = copy.deepcopy(self.cleared_graph.graph)
 
-        self.equvalent(self.eq_graph.graph)
-
-        self.ui.button_source.setEnabled(True)
         self.ui.excel_button_3.setEnabled(True)
-        self.ui.button_cleared.setEnabled(True)
 
     def drop_unweighted(self, graph):
         all_nodes = set(graph.nodes)
         while len(all_nodes) > 0:
             fnodes = list(
                 filter(
-                    lambda x: nx.degree(graph, x) == 1 and x not in self.source_node and x not in self.weight_nodes.keys(),
+                    lambda x: nx.degree(graph,
+                                        x) == 1 and x not in self.source_node and x not in self.weight_nodes.keys(),
                     graph.nodes))
             for node in fnodes:
                 graph.remove_node(node)
@@ -147,40 +123,32 @@ class App:
         return graph
 
     def import_data(self):
-        # импортировать данные с excel
         dialog = QFileDialog()
         try:
             fname = dialog.getOpenFileName(filter='*.xlsx')
             xl = pd.ExcelFile(fname[0], engine='openpyxl')
         except InvalidFileException:
-            self.drop_error('File opening error')
+            self.drop_error('Ошибка открытия файла')
             return
 
         try:
-            self.df_edges = xl.parse('Edges')
-            self.df_nodes = xl.parse('Nodes')
+            self.df_edges = xl.parse('Ребра')
+            self.df_nodes = xl.parse('Узлы')
 
             xl.close()
             # заполнение рёбер графа
-            for first, second in zip(self.df_edges['first_node'], self.df_edges['second_node']):
+            for first, second in zip(self.df_edges['Узел 1'], self.df_edges['Узел 2']):
                 self.imported_edges.append((first, second))
 
-            if len(list(self.df_edges['first_node'])) != len(list(self.df_edges['second_node'])):
-                self.drop_error('Incorrect edges data')
-                return
-
             # заполнение нод, имеющих вес
-            for node, weight in zip(self.df_nodes['weighted_nodes'], self.df_nodes['weight']):
+            for node, weight in zip(self.df_nodes['Наименование узла'], self.df_nodes['Нагрузка узла']):
                 self.weight_nodes[node] = weight
 
-
         except (AttributeError, KeyError, ValueError):
-            self.drop_error('Incorrect file')
+            self.drop_error('Некорректный файл')
             return
 
         self.init_graphs()
-
-    new_dict = {}
 
     def count_data(self, node) -> None:
         if not isinstance(node, dict):
@@ -204,33 +172,23 @@ class App:
                 self.dfs(child)
         self.counted_nodes[list(node.keys())[0]] = node_data['data']
 
-    def equvalent(self, graph):
-
-        return graph
-
-    def draw_imported_graph(self):
-        self.imported_graph.show_graph()
-
-    def draw_cleared_graph(self):
-        self.cleared_graph.show_graph()
-
     def export_eq_graph(self):
-        self.eq_df = pd.DataFrame(columns=['точка1', 'точка2', 'нагрузка'])
-        self.eq_df_nodes = pd.DataFrame(columns=['точка', 'нагрузка'])
+        self.eq_df = pd.DataFrame(columns=['Узел 1', 'Узел 2', 'Нагрузка ребра'])
+        self.eq_df_nodes = pd.DataFrame(columns=['Наименование узла', 'Нагрузка узла'])
 
         for edge in self.counted_edges:
             self.eq_df = self.eq_df.append(
-                {'точка1': edge[0], 'точка2': edge[1], 'нагрузка': edge[2]}, ignore_index=True)
+                {'Узел 1': edge[0], 'Узел 2': edge[1], 'Нагрузка ребра': edge[2]}, ignore_index=True)
 
         for node in self.counted_nodes:
             self.eq_df_nodes = self.eq_df_nodes.append(
-                {'точка': node, 'нагрузка': self.counted_nodes[node]}, ignore_index=True)
+                {'Наименование узла': node, 'Нагрузка узла': self.counted_nodes[node]}, ignore_index=True)
 
         dialog = QFileDialog()
         try:
             fname = dialog.getSaveFileName(filter='*.xlsx')
         except InvalidFileException:
-            self.drop_error('Ошибка сохранения файла')
+            self.drop_error('Ошибка сохранения')
             return
 
         try:
@@ -238,8 +196,7 @@ class App:
                 self.eq_df.to_excel(writer, sheet_name='edges')
                 self.eq_df_nodes.to_excel(writer, sheet_name='nodes')
         except PermissionError:
-            self.drop_error(
-                'Ошибка экспорта, сохраняемый файл недоступен для редактирования\nЗакройте сохраняемый файл')
+            self.drop_error('Ошибка сохранения')
 
 
 app = App()
