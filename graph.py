@@ -112,11 +112,12 @@ class App:
             if self.counted_nodes.get(n2, 0) > 0:
                 self.counted_edges.append((n1, n2, self.counted_nodes.get(n2, 0)))
 
+        self.weight_cleared_nodes[self.source_node] = self.counted_nodes[self.source_node]
+
         self.eq_graph.init_graph(self.counted_edges)
 
         self.drop_unweighted(self.eq_graph.graph)
 
-        self.ui.button_source.setEnabled(True)
         self.ui.excel_button_3.setEnabled(True)
 
     def drop_unweighted(self, graph):
@@ -184,23 +185,18 @@ class App:
                 self.take_nodes(child)
         self.counted_nodes[list(node.keys())[0]] = node_data['data']
 
-    def draw_imported_graph(self):
-        self.imported_graph.show_graph()
-
-    def draw_cleared_graph(self):
-        self.eq_graph.show_graph()
-
     def export_eq_graph(self):
         self.eq_df = pd.DataFrame(columns=['Узел 1', 'Узел 2', 'Нагрузка ребра'])
         self.eq_df_nodes = pd.DataFrame(columns=['Наименование узла', 'Нагрузка узла'])
 
         for edge in self.eq_graph.graph.edges:
             self.eq_df = self.eq_df.append(
-                {'Узел 1': edge[0], 'Узел 2': edge[1], 'Нагрузка ребра': edge[2]}, ignore_index=True)
+                {'Узел 1': edge[0], 'Узел 2': edge[1], 'Нагрузка ребра': self.counted_nodes[edge[1]]}, ignore_index=True)
 
         for node in self.counted_nodes:
-            self.eq_df_nodes = self.eq_df_nodes.append(
-                {'Наименование узла': node, 'Нагрузка узла': self.counted_nodes[node]}, ignore_index=True)
+            if node in self.weight_cleared_nodes.keys() and self.counted_nodes[node] > 0:
+                self.eq_df_nodes = self.eq_df_nodes.append(
+                    {'Наименование узла': node, 'Нагрузка узла': self.counted_nodes[node]}, ignore_index=True)
 
         dialog = QFileDialog()
         try:
