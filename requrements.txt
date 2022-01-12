@@ -1,0 +1,14 @@
+matplotlib
+networkx
+numpy
+openpyxl
+pandas
+Pillow
+pyparsing
+PySide2
+python-dateutil
+pytz
+pywin32-ctypes
+shiboken2
+six
+treelib

@@ -193,8 +193,8 @@ class App:
 
         try:
             with pd.ExcelWriter(fname[0]) as writer:
-                self.eq_df.to_excel(writer, sheet_name='edges')
-                self.eq_df_nodes.to_excel(writer, sheet_name='nodes')
+                self.eq_df.to_excel(writer, sheet_name='Ребра')
+                self.eq_df_nodes.to_excel(writer, sheet_name='Точки')
         except PermissionError:
             self.drop_error('Ошибка сохранения')
 
