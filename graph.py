@@ -44,6 +44,7 @@ class GraphModeller:
 
 class App:
     def __init__(self):
+        self.weight_cleared_nodes = {}
         self.imported_graph = GraphModeller()
         self.imported_edges = []
 
@@ -72,6 +73,7 @@ class App:
         self.ui.source_box.currentIndexChanged.connect(self.change_source)
         self.ui.excel_button_3.clicked.connect(self.export_eq_graph)
         self.ui.button_cleared.clicked.connect(self.draw_cleared_graph)
+        self.ui.source_box.setDuplicatesEnabled(False)
 
         plt.ion()
         plt.show()
@@ -96,38 +98,42 @@ class App:
         # инициализация импортированного графа
         self.imported_graph.init_graph(self.imported_edges)
 
+        self.cleared_graph.graph.clear()
+        self.eq_graph.graph.clear()
+
         for node in self.imported_graph.graph.nodes:
             self.ui.source_box.addItem(node)
 
         self.ui.source_box.setEnabled(True)
 
-        self.drop_unweighted(self.cleared_graph.graph)
+        # получение подграфа подключенного к источнику
+        self.cleared_edges = [edge for edge in nx.bfs_edges(self.imported_graph.graph, self.source_node)]
+        self.cleared_graph.init_graph(self.cleared_edges)
 
-        self.cleared_edges = [edge for edge in nx.dfs_edges(self.imported_graph.graph, self.source_node)]
+        self.weight_cleared_nodes.clear()
+        for node in self.weight_nodes.keys():
+            if node in self.cleared_graph.graph.nodes:
+                self.weight_cleared_nodes[node] = self.weight_nodes[node]
 
         # эквивалентирование
         tr = Tree()
-        tr.create_node(self.cleared_edges[0][0], self.cleared_edges[0][0], data=0)
-        tr.create_node(self.cleared_edges[0][1], self.cleared_edges[0][1], parent=self.cleared_edges[0][0], data=0)
-        for e1, e2 in self.cleared_edges[1:]:
-            tr.create_node(e2, e2, parent=e1, data=self.weight_nodes[e2] if e2 in self.weight_nodes else 0)
+        for e1, e2 in self.cleared_edges:
+            if e1 not in tr.nodes:
+                tr.create_node(e1, e1, data=self.weight_cleared_nodes[e2] if e2 in self.weight_cleared_nodes else 0)
+            tr.create_node(e2, e2, parent=e1, data=self.weight_cleared_nodes[e2] if e2 in self.weight_cleared_nodes else 0)
 
         tr_dict = tr.to_dict(with_data=True)
 
-        self.count_data(tr_dict)
+        self.count_edges(tr_dict)
 
-        self.dfs(tr_dict)
-
-        pprint(self.counted_nodes)
+        self.take_nodes(tr_dict)
 
         for n1, n2 in self.cleared_edges:
             self.counted_edges.append((n1, n2, self.counted_nodes.get(n2, 0)))
 
-        self.cleared_graph.init_graph(self.counted_edges)
+        self.eq_graph.init_graph(self.counted_edges)
 
-        self.eq_graph.graph = copy.deepcopy(self.cleared_graph.graph)
-
-        self.equvalent(self.eq_graph.graph)
+        self.drop_unweighted(self.eq_graph.graph)
 
         self.ui.button_source.setEnabled(True)
         self.ui.excel_button_3.setEnabled(True)
@@ -138,7 +144,8 @@ class App:
         while len(all_nodes) > 0:
             fnodes = list(
                 filter(
-                    lambda x: nx.degree(graph, x) == 1 and x not in self.source_node and x not in self.weight_nodes.keys(),
+                    lambda x: nx.degree(graph,
+                                        x) == 1 and x not in self.source_node and x not in self.weight_cleared_nodes.keys(),
                     graph.nodes))
             for node in fnodes:
                 graph.remove_node(node)
@@ -180,9 +187,7 @@ class App:
 
         self.init_graphs()
 
-    new_dict = {}
-
-    def count_data(self, node) -> None:
+    def count_edges(self, node) -> None:
         if not isinstance(node, dict):
             node = {node: {}}
 
@@ -190,41 +195,38 @@ class App:
 
         if node.get('children'):
             for child in node['children']:
-                self.count_data(child)
+                self.count_edges(child)
             try:
                 node['data'] += sum(child[list(child.keys())[0]]['data'] for child in node['children'])
             except KeyError:
                 print(node)
 
-    def dfs(self, node):
+    def take_nodes(self, node):
         node_data = node[list(node.keys())[0]]
 
         if node_data.get('children'):
             for child in node_data['children']:
-                self.dfs(child)
+                self.take_nodes(child)
         self.counted_nodes[list(node.keys())[0]] = node_data['data']
-
-    def equvalent(self, graph):
-
-        return graph
 
     def draw_imported_graph(self):
         self.imported_graph.show_graph()
 
     def draw_cleared_graph(self):
-        self.cleared_graph.show_graph()
+        self.eq_graph.show_graph()
 
     def export_eq_graph(self):
         self.eq_df = pd.DataFrame(columns=['точка1', 'точка2', 'нагрузка'])
         self.eq_df_nodes = pd.DataFrame(columns=['точка', 'нагрузка'])
 
-        for edge in self.counted_edges:
+        for edge in self.eq_graph.graph.edges:
             self.eq_df = self.eq_df.append(
-                {'точка1': edge[0], 'точка2': edge[1], 'нагрузка': edge[2]}, ignore_index=True)
+                {'точка1': edge[0], 'точка2': edge[1], 'нагрузка': self.counted_nodes[edge[1]]}, ignore_index=True)
 
         for node in self.counted_nodes:
-            self.eq_df_nodes = self.eq_df_nodes.append(
-                {'точка': node, 'нагрузка': self.counted_nodes[node]}, ignore_index=True)
+            if node in self.eq_graph.graph.nodes:
+                self.eq_df_nodes = self.eq_df_nodes.append(
+                    {'точка': node, 'нагрузка': self.counted_nodes[node]}, ignore_index=True)
 
         dialog = QFileDialog()
         try:
