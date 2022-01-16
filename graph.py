@@ -14,6 +14,23 @@ from openpyxl.utils.exceptions import InvalidFileException
 from mainwindow import Ui_MainWindow
 
 
+class Node:
+    # датакласс для хранения узлов графа
+    def __init__(self, name, weight, source):
+        self.name = name
+        self.weight = weight
+        self.source = source
+
+
+class Edge:
+    # датакласс для хранения рёбер графа
+    def __init__(self, first, second, weight):
+        self.first = first
+        self.second = second
+        self.edge = first, second
+        self.weight = weight
+
+
 class GraphModeller:
     def __init__(self):
         self.nodes = []
@@ -47,6 +64,7 @@ class App:
         self.weight_cleared_nodes = {}
         self.imported_graph = GraphModeller()
         self.imported_edges = []
+        self.source_nodes = []
 
         self.cleared_graph = GraphModeller()
         self.cleared_edges = []
@@ -58,8 +76,6 @@ class App:
 
         self.weight_nodes = {}
 
-        self.source_node = None
-
         self.df_edges = None
         self.df_nodes = None
 
@@ -70,10 +86,8 @@ class App:
 
         self.ui.init_button.clicked.connect(self.import_data)
         self.ui.button_source.clicked.connect(self.draw_imported_graph)
-        self.ui.source_box.currentIndexChanged.connect(self.change_source)
         self.ui.excel_button_3.clicked.connect(self.export_eq_graph)
         self.ui.button_cleared.clicked.connect(self.draw_cleared_graph)
-        self.ui.source_box.setDuplicatesEnabled(False)
 
         plt.ion()
         plt.show()
@@ -89,11 +103,6 @@ class App:
         mbox.setStandardButtons(QMessageBox.Ok)
         mbox.exec_()
 
-    def change_source(self):
-        self.source_node = self.ui.source_box.currentText()
-        print(self.source_node)
-        self.init_graphs()
-
     def init_graphs(self):
         # инициализация импортированного графа
         self.imported_graph.init_graph(self.imported_edges)
@@ -101,14 +110,14 @@ class App:
         self.cleared_graph.graph.clear()
         self.eq_graph.graph.clear()
 
-        for node in self.imported_graph.graph.nodes:
-            self.ui.source_box.addItem(node)
+        source_sub_edges = []
+        # построение массива подграфов, подключенных к источникам
+        for source_node in self.source_nodes:
+            source_sub_edges.append(list(nx.dfs_edges(self.imported_graph.graph, source_node)))
 
-        self.ui.source_box.setEnabled(True)
+        print(source_sub_edges)
 
-        # получение подграфа подключенного к источнику
-        self.cleared_edges = [edge for edge in nx.bfs_edges(self.imported_graph.graph, self.source_node)]
-        self.cleared_graph.init_graph(self.cleared_edges)
+        return
 
         self.weight_cleared_nodes.clear()
         for node in self.weight_nodes.keys():
@@ -120,7 +129,8 @@ class App:
         for e1, e2 in self.cleared_edges:
             if e1 not in tr.nodes:
                 tr.create_node(e1, e1, data=self.weight_cleared_nodes[e2] if e2 in self.weight_cleared_nodes else 0)
-            tr.create_node(e2, e2, parent=e1, data=self.weight_cleared_nodes[e2] if e2 in self.weight_cleared_nodes else 0)
+            tr.create_node(e2, e2, parent=e1,
+                           data=self.weight_cleared_nodes[e2] if e2 in self.weight_cleared_nodes else 0)
 
         tr_dict = tr.to_dict(with_data=True)
 
@@ -179,8 +189,15 @@ class App:
                 return
 
             # заполнение нод, имеющих вес
-            for node, weight in zip(self.df_nodes['weighted_nodes'], self.df_nodes['weight']):
+            for node, weight, source in zip(self.df_nodes['weighted_nodes'], self.df_nodes['weight'],
+                                            self.df_nodes['source']):
                 self.weight_nodes[node] = weight
+                if not pd.isnull(source):
+                    self.source_nodes.append(node)
+
+            print(self.source_nodes)
+
+
 
 
         except (AttributeError, KeyError, ValueError):
