@@ -120,7 +120,8 @@ class App:
         for e1, e2 in self.cleared_edges:
             if e1 not in tr.nodes:
                 tr.create_node(e1, e1, data=self.weight_cleared_nodes[e2] if e2 in self.weight_cleared_nodes else 0)
-            tr.create_node(e2, e2, parent=e1, data=self.weight_cleared_nodes[e2] if e2 in self.weight_cleared_nodes else 0)
+            tr.create_node(e2, e2, parent=e1,
+                           data=self.weight_cleared_nodes[e2] if e2 in self.weight_cleared_nodes else 0)
 
         tr_dict = tr.to_dict(with_data=True)
 
@@ -219,16 +220,28 @@ class App:
 
     def export_eq_graph(self):
         self.eq_df = pd.DataFrame(columns=['точка1', 'точка2', 'нагрузка'])
-        self.eq_df_nodes = pd.DataFrame(columns=['точка', 'нагрузка'])
+        self.eq_df_nodes = pd.DataFrame(columns=['точка', 'нагрузка', 'посещена'])
 
-        for edge in self.eq_graph.graph.edges:
-            self.eq_df = self.eq_df.append(
-                {'точка1': edge[0], 'точка2': edge[1], 'нагрузка': self.counted_nodes[edge[1]]}, ignore_index=True)
+        for edge in self.imported_graph.graph.edges:
+            if edge not in self.eq_graph.graph.edges:
+                self.eq_df = self.eq_df.append(
+                    {'точка1': edge[0], 'точка2': edge[1], 'нагрузка': self.weight_nodes.get(edge[1], 0), 'посещена': True},
+                    ignore_index=True)
+            else:
+                self.eq_df = self.eq_df.append(
+                    {'точка1': edge[0], 'точка2': edge[1], 'нагрузка': self.counted_nodes.get(edge[1], 0), 'посещена': False},
+                    ignore_index=True)
 
-        for node in self.counted_nodes:
+        for node in self.imported_graph.graph.nodes:
             if node in self.eq_graph.graph.nodes:
                 self.eq_df_nodes = self.eq_df_nodes.append(
-                    {'точка': node, 'нагрузка': self.counted_nodes[node]}, ignore_index=True)
+                    {'точка': node, 'нагрузка': self.counted_nodes[node], 'посещена': True}, ignore_index=True)
+            elif node in self.weight_nodes:
+                self.eq_df_nodes = self.eq_df_nodes.append(
+                    {'точка': node, 'нагрузка': self.weight_nodes[node], 'посещена': False}, ignore_index=True)
+            else:
+                self.eq_df_nodes = self.eq_df_nodes.append(
+                    {'точка': node, 'нагрузка': 0, 'посещена': False}, ignore_index=True)
 
         dialog = QFileDialog()
         try:
