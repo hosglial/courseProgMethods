@@ -99,7 +99,8 @@ class App:
         for e1, e2 in self.cleared_edges:
             if e1 not in tr.nodes:
                 tr.create_node(e1, e1, data=self.weight_cleared_nodes[e2] if e2 in self.weight_cleared_nodes else 0)
-            tr.create_node(e2, e2, parent=e1, data=self.weight_cleared_nodes[e2] if e2 in self.weight_cleared_nodes else 0)
+            tr.create_node(e2, e2, parent=e1,
+                           data=self.weight_cleared_nodes[e2] if e2 in self.weight_cleared_nodes else 0)
 
         tr_dict = tr.to_dict(with_data=True)
 
@@ -191,12 +192,15 @@ class App:
 
         for edge in self.eq_graph.graph.edges:
             self.eq_df = self.eq_df.append(
-                {'Узел 1': edge[0], 'Узел 2': edge[1], 'Нагрузка ребра': self.counted_nodes[edge[1]]}, ignore_index=True)
+                {'Узел 1': edge[0], 'Узел 2': edge[1], 'Нагрузка ребра': self.counted_nodes[edge[1]]},
+                ignore_index=True)
 
         for node in self.counted_nodes:
             if node in self.weight_cleared_nodes.keys() and self.counted_nodes[node] > 0:
                 self.eq_df_nodes = self.eq_df_nodes.append(
-                    {'Наименование узла': node, 'Нагрузка узла': self.counted_nodes[node]}, ignore_index=True)
+                    {'Наименование узла': node, 'Нагрузка узла': self.counted_nodes[node],
+                     'Узел свернут': 'Да' if self.counted_nodes[node] > 0 and node != self.source_node else 'Нет'},
+                    ignore_index=True)
 
         dialog = QFileDialog()
         try:
