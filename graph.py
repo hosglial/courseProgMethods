@@ -259,7 +259,7 @@ class App:
 
         for edge in self.eq_graph.graph.edges:
             self.eq_df = self.eq_df.append(
-                {'точка1': edge[0], 'точка2': edge[1], 'нагрузка': self.counted_nodes[edge[1]]}, ignore_index=True)
+                {'точка1': edge[0], 'точка2': edge[1], 'нагрузка': self.counted_nodes[edge[1]]['weight']}, ignore_index=True)
 
         for node in self.counted_nodes:
             if node in self.eq_graph.graph.nodes:
@@ -267,7 +267,7 @@ class App:
                     {'точка': node,
                      'нагрузка': self.counted_nodes[node]['weight'],
                      'источник': self.counted_nodes[node]['source'],
-                     'посещена': self.counted_nodes[node]['visited']},
+                     'посещена': self.counted_nodes[node].get('visited', 'Removed')},
                     ignore_index=True)
 
         dialog = QFileDialog()
