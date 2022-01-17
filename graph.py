@@ -160,7 +160,7 @@ class App:
         # импортировать данные с excel
         dialog = QFileDialog()
         try:
-            fname = dialog.getOpenFileName(filter='*.xlsx')
+            fname = dialog.getOpenFileName(filter='*.xlsx', directory='/home/ashchigol/PycharmProjects/prog_methods')
             xl = pd.ExcelFile(fname[0], engine='openpyxl')
         except InvalidFileException:
             self.drop_error('File opening error')
@@ -219,17 +219,19 @@ class App:
         self.eq_graph.show_graph()
 
     def export_eq_graph(self):
-        self.eq_df = pd.DataFrame(columns=['точка1', 'точка2', 'нагрузка'])
+        self.eq_df = pd.DataFrame(columns=['точка1', 'точка2', 'нагрузка','посещена'])
         self.eq_df_nodes = pd.DataFrame(columns=['точка', 'нагрузка', 'посещена'])
 
         for edge in self.imported_graph.graph.edges:
             if edge not in self.eq_graph.graph.edges:
                 self.eq_df = self.eq_df.append(
-                    {'точка1': edge[0], 'точка2': edge[1], 'нагрузка': self.weight_nodes.get(edge[1], 0), 'посещена': True},
+                    {'точка1': edge[0], 'точка2': edge[1], 'нагрузка': self.weight_nodes.get(edge[1], 0),
+                     'посещена': False},
                     ignore_index=True)
             else:
                 self.eq_df = self.eq_df.append(
-                    {'точка1': edge[0], 'точка2': edge[1], 'нагрузка': self.counted_nodes.get(edge[1], 0), 'посещена': False},
+                    {'точка1': edge[0], 'точка2': edge[1], 'нагрузка': self.counted_nodes.get(edge[1], 0),
+                     'посещена': True},
                     ignore_index=True)
 
         for node in self.imported_graph.graph.nodes:
